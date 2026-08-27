@@ -411,7 +411,7 @@ async function main() {
   {
     // Peat's Blue Crow: battle buff = hand count
     const G = OJ.engine.newGame({ p0cpu: true, boardId: 'practice' });
-    const p = G.players[0]; p.charId = 'peat'; p.level = 2;
+    const p = G.players[0]; p.charId = 'peat'; p.level = 2; p.stars = 100; // can pay the hyper cost
     p.hand = ['COOKIE', 'DASH', 'HYPER_PEAT'];
     const ctx = { buffs: G.players.map(() => ({ atk: 0, def: 0, evd: 0 })), buffTags: G.players.map(() => []), reverse: false };
     await OJ.engine.applyBattleCard(G, OJ.ai.cpuIO(), ctx, p, 'HYPER_PEAT');

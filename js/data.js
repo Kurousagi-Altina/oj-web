@@ -10,13 +10,13 @@
               passive: 'None', passiveZh: '无', sprite: 'qp' },
     suguri: { name: 'Suguri', nameZh: '须玖莉', hp: 4, atk: 1,  def: -1, evd: 2,  rec: 5, hyper: 'HYPER_SUGURI', maxHand: 3, unitKey: 'CARD_UNIT_SUGURI',
               passive: 'None', passiveZh: '无', sprite: 'suguri' },
-    marc:   { name: 'Marc',   nameZh: '玛露',   hp: 4, atk: 1,  def: 1,  evd: -1, rec: 5, hyper: 'HYPER_MARC', maxHand: 3, unitKey: 'CARD_UNIT_MARC',
+    marc:   { name: 'Marc',   nameZh: '玛儿',   hp: 4, atk: 1,  def: 1,  evd: -1, rec: 5, hyper: 'HYPER_MARC', maxHand: 3, unitKey: 'CARD_UNIT_MARC',
               passive: 'None', passiveZh: '无', sprite: 'marc' },
     kai:    { name: 'Kai',    nameZh: '凯',    hp: 5, atk: 1,  def: 0,  evd: 0,  rec: 5, hyper: 'HYPER_KAI',  maxHand: 3, unitKey: 'CARD_UNIT_KAI',
               passive: 'None', passiveZh: '无', sprite: 'kai' },
-    aru:    { name: 'Aru',    nameZh: '亚露',   hp: 5, atk: -1, def: -1, evd: 2,  rec: 5, hyper: 'HYPER_ARU',  maxHand: 4, unitKey: 'CARD_UNIT_ARU',
-              passive: 'Can hold 4 cards', passiveZh: '手牌上限4张', sprite: 'aru' },
-    hime:   { name: 'Hime',   nameZh: '姬梅',   hp: 5, atk: 1,  def: -1, evd: 1,  rec: 5, hyper: 'HYPER_HIME', maxHand: 3, unitKey: 'CARD_UNIT_HIME',
+    aru:    { name: 'Aru',    nameZh: '亚琉',   hp: 5, atk: -1, def: -1, evd: 2,  rec: 5, hyper: 'HYPER_ARU',  maxHand: 4, unitKey: 'CARD_UNIT_ARU',
+              passive: 'Can hold 4 cards', passiveZh: '手牌上限为4张。', sprite: 'aru' },
+    hime:   { name: 'Hime',   nameZh: '姬梦',   hp: 5, atk: 1,  def: -1, evd: 1,  rec: 5, hyper: 'HYPER_HIME', maxHand: 3, unitKey: 'CARD_UNIT_HIME',
               passive: 'None', passiveZh: '无', sprite: 'hime' },
     yuki:   { name: 'Yuki',   nameZh: '由希',   hp: 5, atk: 2,  def: -1, evd: -1, rec: 5, hyper: 'HYPER_YUKI', maxHand: 3, unitKey: 'CARD_UNIT_YUKI',
               passive: 'None', passiveZh: '无', sprite: 'yuki' },
@@ -32,11 +32,11 @@
 
   // ---- mobs (official stats from wiki) ----
   OJ.MOBS = {
-    chicken:  { name: 'Chicken',   nameZh: '小鸡',     hp: 3, atk: -1, def: -1, evd: 1,  sprite: 'chicken' },
+    chicken:  { name: 'Chicken',   nameZh: '鸡',      hp: 3, atk: -1, def: -1, evd: 1,  sprite: 'chicken' },
     roboball: { name: 'Robo Ball', nameZh: '机器球',   hp: 3, atk: -1, def: 1,  evd: -1, sprite: 'roboball' },
     seagull:  { name: 'Seagull',   nameZh: '海鸥',     hp: 3, atk: 1,  def: -1, evd: -1, sprite: 'seagull' },
     // boss variants — wiki "<Boss>" pages, NOT the playable character stats
-    shifu:        { name: 'Shifu Robot',   nameZh: '师傅机器人', hp: 7,  atk: 2, def: 3, evd: -2, sprite: 'shifu', boss: true },
+    shifu:        { name: 'Shifu Robot',   nameZh: '希夫',       hp: 7,  atk: 2, def: 3, evd: -2, sprite: 'shifu', boss: true },
     manager:      { name: 'Store Manager', nameZh: '店长',      hp: 8,  atk: 3, def: 2, evd: -1, sprite: 'manager', boss: true },
     flyingcastle: { name: 'Flying Castle', nameZh: '飞天城堡',  hp: 10, atk: 2, def: 1, evd: -3, sprite: 'flyingcastle', boss: true },
   };

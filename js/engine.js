@@ -56,6 +56,23 @@
     return true;
   }
 
+  // ---- usage timing (wiki/Battle & card types) ----
+  // Battle-type cards AND battle Hypers (Hyper Mode, Blue Crow) are only
+  // playable at battle start; everything else only during your own turn.
+  function isBattleTiming(cardId) {
+    const c = C()[cardId];
+    return !!(c && c.battle);
+  }
+  function playableOnField(G, p, cardId) {
+    return !isBattleTiming(cardId) && baseUsable(G, p, cardId);
+  }
+  function playableInBattle(G, p, cardId, role) {
+    const c = C()[cardId];
+    if (!c || !c.battle) return false;
+    if (c.defenderOnly && role !== 'defender') return false;
+    return baseUsable(G, p, cardId);
+  }
+
   // ---------------- game construction ----------------
   function newGame(opts) {
     opts = Object.assign({ rng: Math.random, charIds: null, p0cpu: false, boardId: 'clover' }, opts);
@@ -240,12 +257,12 @@
     await io.onBattlePhase(G, 'attackCards', { ctx });
     if (!attacker.isMobUnit) {
       const pa = await io.promptBattleCard(G, attacker, ctx, 'attacker');
-      if (pa) await applyBattleCard(G, io, ctx, attacker, pa);
+      if (pa) await applyBattleCard(G, io, ctx, attacker, pa, 'attacker');
     }
     await io.onBattlePhase(G, 'defendCards', { ctx });
     if (!defender.isMobUnit) {
       const pd = await io.promptBattleCard(G, defender, ctx, 'defender');
-      if (pd) await applyBattleCard(G, io, ctx, defender, pd);
+      if (pd) await applyBattleCard(G, io, ctx, defender, pd, 'defender');
     }
 
     // Kai's Protagonist's Privilege (wiki/Kai Hyper): if the unit that
@@ -313,7 +330,8 @@
     return false;
   }
 
-  async function applyBattleCard(G, io, ctx, p, cardId) {
+  async function applyBattleCard(G, io, ctx, p, cardId, role) {
+    if (!playableInBattle(G, p, cardId, role || 'attacker')) return false; // wrong timing/role — no effect
     const idx = p.hand.indexOf(cardId);
     if (idx >= 0) p.hand.splice(idx, 1);
     G.centerDiscard.push(cardId);
@@ -564,8 +582,10 @@
 
   async function useCard(G, io, p, cardId, target) {
     const c = C()[cardId];
+    // field timing only: battle cards used outside battle would fizzle here
+    if (!c || !playableOnField(G, p, cardId)) return false;
     const i = p.hand.indexOf(cardId);
-    if (i < 0) return;
+    if (i < 0) return false;
     p.stars -= cardCost(cardId, p);
     p.hand.splice(i, 1);
     await io.log(L()(`${p.name} 使用了 ${OJ.t(cardId, 'name')}！`, `${p.name} uses ${c.name}!`));
@@ -656,12 +676,17 @@
         consume(); break;
       }
       case 'HYPER_ARU': {
+        // wiki/Aru/Hyper: ALL players draw up to a full hand (full hands draw
+        // 1 instead) — including the caster; user gains 10★ per card drawn.
+        // The count happens after this card left the hand, so the caster
+        // draws too (Aru's maxHand 4: solo play = +40★ minimum & a new hand).
         let total = 0;
-        for (const q of otherPlayers(G, p)) {
+        for (const q of G.players) {
           if (q.ko) continue;
           const max = OJ.CHARS[q.charId].maxHand;
-          if (q.hand.length >= max) { await draw(G, io, q, 1); total += 1; }
-          else { const n = max - q.hand.length; await draw(G, io, q, n); total += n; }
+          const n = q.hand.length >= max ? 1 : max - q.hand.length;
+          await draw(G, io, q, n);
+          total += n;
         }
         p.stars += 10 * total;
         await io.log(L()(`${p.name} 获得了 ${10 * total} 星星！`, `${p.name} gains ${10 * total} stars!`));
@@ -719,6 +744,7 @@
       }
       default: consume();
     }
+    return true;
   }
 
   async function resolveBindingChains(G, io, p) {
@@ -982,7 +1008,8 @@
         target = await io.promptCardTarget(G, p, cardId, cardTargets(G, p, cardId));
         if (!target) continue; // cancelled target -> choose again / move
       }
-      await useCard(G, io, p, cardId, target);
+      const ok = await useCard(G, io, p, cardId, target);
+      if (!ok) continue; // wrong timing/cost -> pick another card or move
       played = true;
     }
     if (G.winner) { await endTurn(G, io, p); return; }
@@ -1048,6 +1075,7 @@
   OJ.engine = {
     newGame, runGame, playTurn, battle, applyBattleCard, useCard, panelEffect, move, normaCheck,
     awardChapterStars, draw, d6, rollDice, shuffle, cardCost, canPay, levelOk, baseUsable, cardTargets,
+    isBattleTiming, playableOnField, playableInBattle,
     normaOptions, normaReq, normaMet, makeMob, setTrap, effStat, diceCount, bfsDist, effType, homeOwner,
     koUnit, getWild, getBoss,
   };

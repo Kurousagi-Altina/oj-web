@@ -349,10 +349,13 @@
         return modal(`<h3>${L('出牌阶段 — 使用卡牌或移动', 'Play a card or move')}</h3>`, (box, done) => {
           const hand = el('div', 'hand');
           for (const cid of p.hand) {
-            const usable = E().baseUsable(G, p, cid);
+            // battle-timed cards are greyed out: they can only be used at battle start
+            const usable = E().playableOnField(G, p, cid);
             hand.insertAdjacentHTML('beforeend', cardHTML(cid, { disabled: !usable, cost: E().cardCost(cid, p) }));
           }
           box.appendChild(hand);
+          const hint = el('p', 'hint', L('灰暗的卡现在无法使用（战斗卡要在战斗开始时使用）', 'Greyed cards cannot be used now (battle cards only when battle starts)'));
+          box.appendChild(hint);
           const skip = el('button', 'btn primary big', L('掷骰移动 ▶', 'Roll & Move ▶'));
           skip.onclick = () => done(null);
           box.appendChild(skip);
@@ -416,12 +419,9 @@
       async promptBattleCard(G, p, ctx, role) {
         if (p.isMobUnit) return null;
         if (p.isCPU) return OJ.ai.wantBattleCard(G, p, ctx, role);
-        const usable = p.hand.filter((cid) => {
-          const c = C()[cid];
-          if (c.type !== 'Battle' && c.type !== 'Hyper') return false;
-          if (c.defenderOnly && role !== 'defender') return false;
-          return E().baseUsable(G, p, cid);
-        });
+        // only battle-timed cards here (Battle cards + battle Hypers);
+        // field cards like event Hypers would fizzle with no effect
+        const usable = p.hand.filter((cid) => E().playableInBattle(G, p, cid, role));
         const title = role === 'attacker'
           ? L('你的攻击回合 — 使用战斗卡？', 'Your attack — play a battle card?')
           : L('防御准备 — 使用防御卡？', 'Defending — play a battle card?');

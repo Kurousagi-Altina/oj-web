@@ -75,6 +75,7 @@
   function wantPlayCard(G, p, cardId) {
     const c = C()[cardId];
     if (!c || !E().baseUsable(G, p, cardId) || !p.hand.includes(cardId)) return false;
+    if (E().isBattleTiming(cardId)) return false; // battle cards only via wantBattleCard
     const hurt = p.maxhp - p.hp;
     switch (cardId) {
       case 'PUDDING': return hurt >= 3;
@@ -148,9 +149,8 @@
     const list = role === 'attacker' ? BATTLE_CARDS_ATTACK : BATTLE_CARDS_DEFEND;
     for (const cid of list) {
       if (!p.hand.includes(cid)) continue;
-      if (!E().baseUsable(G, p, cid)) continue;
+      if (!E().playableInBattle(G, p, cid, role)) continue; // timing/role/cost/level gate
       const c = C()[cid];
-      if (c.defenderOnly && role !== 'defender') continue;
       if (cid === 'HYPER_QP' && role === 'attacker') return cid;
       if (cid === 'HYPER_QP' && role === 'defender' && p.hp <= 2) return cid;
       if (cid === 'BIGMAGNUM' && p.hp >= 3) return cid;
