@@ -350,7 +350,9 @@ button, .card, .charcard, .boardcard { touch-action: manipulation; }
   .pstats { font-size: 11.5px; gap: 4px; }
   .pstats .mini { display: none; } /* save space: keep stars/wins/hp only */
   #boardwrap { grid-area: board; }
-  #board { width: 100%; height: auto; max-height: calc(100dvh - 74px); }
+  /* no width forcing here — only max constraints, so the canvas keeps its
+     intrinsic aspect ratio instead of being squashed */
+  #board { max-height: calc(100dvh - 74px); }
 
   /* ---------- floating log drawer ---------- */
   .mobile-only { display: inline-block; }
