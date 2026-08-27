@@ -329,30 +329,43 @@ button, .card, .charcard, .boardcard { touch-action: manipulation; }
   #rotate-hint .rh-continue { display: inline-block; }
 
   /* ---------- game: landscape-first ----------
-     player panels as a column left of the map, board on the right */
+     player panels as a narrow column left of the map, HUD floats as a
+     pill so the board claims the full remaining height */
   #game {
-    grid-template-columns: 168px 1fr;
-    grid-template-rows: auto 1fr;
-    grid-template-areas: "top top" "plates board";
-    height: 100dvh; padding: 5px; gap: 5px; overflow: hidden;
+    grid-template-columns: 118px 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "plates board";
+    height: 100dvh; padding: 4px; gap: 4px; overflow: hidden;
   }
   #center { display: contents; } /* topbar/boardwrap become grid children */
-  #topbar { grid-area: top; flex-wrap: wrap; gap: 5px; font-size: 12px; padding: 3px 6px; }
-  .speeds { display: none; } /* save vertical space on small screens */
+  /* floating slim HUD pill over the board's top edge */
+  #topbar {
+    position: fixed; top: 4px; left: 50%; transform: translateX(-50%);
+    z-index: 80; pointer-events: none; /* children re-enable */
+    background: rgba(10,14,18,.85); border: 1px solid var(--line);
+    border-radius: 999px; padding: 2px 10px; gap: 8px;
+    font-size: 11px; max-width: 92vw; white-space: nowrap; overflow: hidden;
+  }
+  #topbar > * { pointer-events: auto; }
+  #fieldevents { font-size: 10.5px; }
+  .speeds { display: none; } /* save space on small screens */
   #leftbar { grid-area: plates; overflow-y: auto; scrollbar-width: none; }
   #leftbar::-webkit-scrollbar { display: none; }
-  #plates { flex-direction: column; gap: 5px; }
-  .player-plate { min-width: 0; padding: 4px 6px; gap: 6px; }
-  .player-plate .face { width: 34px; height: 34px; border-width: 2px; }
-  .pname { font-size: 12.5px; }
-  .hpbar { height: 12px; margin: 2px 0; }
+  #plates { flex-direction: column; gap: 4px; }
+  .player-plate { min-width: 0; padding: 4px 6px; gap: 5px; }
+  .player-plate .face { width: 32px; height: 32px; border-width: 2px; }
+  .pname { font-size: 12px; }
+  .hpbar { height: 11px; margin: 2px 0; }
   .hpbar span { font-size: 9px; padding: 0 4px; }
-  .pstats { font-size: 11.5px; gap: 4px; }
+  .pstats { font-size: 11px; gap: 4px; }
   .pstats .mini { display: none; } /* save space: keep stars/wins/hp only */
-  #boardwrap { grid-area: board; }
-  /* no width forcing here — only max constraints, so the canvas keeps its
-     intrinsic aspect ratio instead of being squashed */
-  #board { max-height: calc(100dvh - 74px); }
+  #boardwrap { grid-area: board; position: relative; }
+  /* percent-fit inside the sized wrapper keeps the aspect ratio intact and
+     ignores unreliable dvh estimates */
+  #board {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    max-width: 100%; max-height: 100%;
+  }
 
   /* ---------- floating log drawer ---------- */
   .mobile-only { display: inline-block; }

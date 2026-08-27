@@ -41,12 +41,23 @@
     R.canvas = canvas;
     R.ctx = canvas.getContext('2d');
     R.G = G;
+    // size the backing store to the displayed box x DPR so tiles stay
+    // crisp when the canvas is scaled up on high-DPI phones
+    const fit = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (fit.width > 80 && fit.height > 80) {
+      const scale = Math.min(dpr, 1600 / fit.width); // fill-rate guard
+      canvas.width = Math.round(fit.width * scale);
+      canvas.height = Math.round(fit.height * scale);
+    }
     const spanX = (G.board.cols + G.board.rows - 2);   // in half-tiles
     const spanY = spanX;
-    R.tileW = Math.floor(Math.min((canvas.width * 0.94) / (spanX / 2 + 1), 120));
+    R.tileW = Math.floor(Math.min((canvas.width * 0.97) / (spanX / 2 + 1), 260));
     R.tileH = Math.floor(R.tileW / 2);
     R.cx = Math.floor(canvas.width / 2);
-    R.cy = Math.floor((canvas.height - spanY * R.tileH / 2) / 2);
+    // vertical centering weighted down: characters & name tags rise well
+    // above their panels, so bias the free space toward the bottom
+    R.cy = Math.floor((canvas.height - spanY * R.tileH / 2) / 2) + Math.floor(R.tileH * 0.5);
     const imgs = {};
     // load panels in parallel
     const panelImgs = await Promise.all(PANEL_IMGS.map((t) => loadImage('assets/panels/' + t + '.png')));

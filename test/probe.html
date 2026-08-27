@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>probe</title>
+<base href="../">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="menu" style="display:none"></div>
+<div id="game" style="display:grid">
+  <div id="leftbar"><div id="plates"></div></div>
+  <div id="center">
+    <div id="topbar"><span id="chapter"></span><span id="fieldevents"></span><span id="deckcount"></span><span class="spacer"></span>
+      <button class="btn small" id="btn_lang">EN</button><button class="btn small mobile-only" id="btn_log">📜</button><button class="btn small" id="btn_restart">↻</button>
+    </div>
+    <div id="boardwrap"><canvas id="board" width="960" height="760"></canvas><div id="battle"></div><div id="handwrap"><div id="hand"></div></div></div>
+  </div>
+  <div id="rightbar"><div id="logbox"><div id="log"></div></div></div>
+</div>
+<div id="banners"></div><div id="modals"></div><div id="tooltip"></div>
+<script src="js/i18n_data.js"></script>
+<script src="js/data.js"></script>
+<script src="js/boards.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(async () => {
+  try {
+    const OJ = globalThis.OJ;
+    document.body.classList.add('in-game');
+    const G = OJ.engine.newGame({ p0cpu: true, boardId: 'clover' });
+    const io = OJ.ui.BrowserIO({ G });
+    await OJ.render.init(document.getElementById('board'), G);
+    const c = document.getElementById('board').getBoundingClientRect();
+    const w = document.getElementById('boardwrap').getBoundingClientRect();
+    const occ = ((c.width * c.height) / (w.width * w.height) * 100).toFixed(0);
+    document.title = 'CANVAS ' + (c.width|0) + 'x' + (c.height|0) +
+      ' ratio=' + (c.width/c.height).toFixed(2) + ' | boardwrap ' + (w.width|0) + 'x' + (w.height|0) +
+      ' | occupancy=' + occ + '% | bitmap=' + document.getElementById('board').width;
+  } catch (e) { document.title = 'ERR ' + e.message; }
+})();
+</script>
+</body>
+</html>
