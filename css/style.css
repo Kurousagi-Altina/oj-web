@@ -291,8 +291,20 @@ body {
 button, .card, .charcard, .boardcard { touch-action: manipulation; }
 .mobile-only { display: none; }
 
+/* rotate-to-landscape guidance (shown during portrait gameplay) */
+#rotate-hint {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(4,6,9,.95); text-align: center;
+  align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+}
+#rotate-hint .rh-icon { font-size: 64px; animation: rh-bob 1.4s ease-in-out infinite; }
+@keyframes rh-bob { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-90deg); } }
+#rotate-hint h2 { color: var(--gold); font-size: 26px; }
+#rotate-hint p { color: var(--dim); font-size: 14px; max-width: 80vw; }
+#rotate-hint .rh-continue { margin-top: 8px; }
+
 @media (max-width: 900px) {
-  /* ---------- menu ---------- */
+  /* ---------- menu (both orientations) ---------- */
   #menu { height: 100dvh; padding-top: 3vh; gap: 14px; }
   #menu h1 { font-size: 30px; }
   #menu h1 .sub { font-size: 13px; }
@@ -300,29 +312,38 @@ button, .card, .charcard, .boardcard { touch-action: manipulation; }
   .boardcard { width: 170px; flex-shrink: 0; }
   .charcard { width: 158px; }
 
-  /* ---------- game: single column ---------- */
+  /* ---------- rotate guidance (portrait only — see portrait query) ---------- */
+  #rotate-hint .rh-continue { display: inline-block; }
+
+  /* ---------- game: landscape-first ----------
+     player panels as a column left of the map, board on the right */
   #game {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto 1fr;
-    grid-template-areas: "top" "plates" "board";
-    height: 100dvh; padding: 6px; gap: 6px; overflow: hidden;
+    grid-template-columns: 168px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "top top" "plates board";
+    height: 100dvh; padding: 5px; gap: 5px; overflow: hidden;
   }
-  #center { display: contents; } /* let topbar/boardwrap become grid children */
-  #topbar { grid-area: top; flex-wrap: wrap; gap: 6px; font-size: 12px; }
-  #leftbar { grid-area: plates; flex-direction: row; overflow-x: auto; scrollbar-width: none; }
+  #center { display: contents; } /* topbar/boardwrap become grid children */
+  #topbar { grid-area: top; flex-wrap: wrap; gap: 5px; font-size: 12px; padding: 3px 6px; }
+  .speeds { display: none; } /* save vertical space on small screens */
+  #leftbar { grid-area: plates; overflow-y: auto; scrollbar-width: none; }
   #leftbar::-webkit-scrollbar { display: none; }
-  #plates { flex-direction: row; }
-  .player-plate { min-width: 185px; flex-shrink: 0; padding: 6px 8px; }
-  .player-plate .face { width: 46px; height: 46px; }
+  #plates { flex-direction: column; gap: 5px; }
+  .player-plate { min-width: 0; padding: 4px 6px; gap: 6px; }
+  .player-plate .face { width: 34px; height: 34px; border-width: 2px; }
+  .pname { font-size: 12.5px; }
+  .hpbar { height: 12px; margin: 2px 0; }
+  .hpbar span { font-size: 9px; padding: 0 4px; }
+  .pstats { font-size: 11.5px; gap: 4px; }
+  .pstats .mini { display: none; } /* save space: keep stars/wins/hp only */
   #boardwrap { grid-area: board; }
-  #board { width: 100%; height: auto; max-height: calc(100dvh - 200px); }
-  #hand .card { width: 74px; height: 104px; }
+  #board { width: 100%; height: auto; max-height: calc(100dvh - 74px); }
 
   /* ---------- floating log drawer ---------- */
   .mobile-only { display: inline-block; }
   #rightbar {
     display: none;
-    position: fixed; right: 8px; bottom: 8px; width: min(260px, 80vw); height: 42dvh;
+    position: fixed; right: 8px; bottom: 8px; width: min(260px, 70vw); height: 46dvh;
     z-index: 70; background: var(--bg1); border: 1px solid var(--line);
     border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.55);
   }
@@ -334,15 +355,29 @@ button, .card, .charcard, .boardcard { touch-action: manipulation; }
   .modal-box.wide { min-width: 0; }
   .modal-box h3 { font-size: 16px; }
   .btn { padding: 9px 16px; font-size: 14px; }
-  .hand .card { width: 92px; height: 128px; }
-  .bt-unit { width: 140px; padding: 10px 8px; }
-  .bt-face { width: 64px; height: 64px; }
+  .hand .card { width: 88px; height: 122px; }
+  .bt-unit { width: 138px; padding: 10px 8px; }
+  .bt-face { width: 62px; height: 62px; }
   .bt-name { font-size: 15px; }
   .bt-row { gap: 10px; }
   .bt-stats { font-size: 10.5px; }
   .bt-roll .die { width: 24px; height: 24px; font-size: 13px; }
   .bt-log { width: 92%; max-height: 110px; }
-
-  /* ---------- roll cutscene close-up ---------- */
   #banners .banner { font-size: 18px; padding: 6px 18px; }
+}
+
+/* ---------- portrait fallback (rotate hint covers; single column if dismissed) ---------- */
+@media (max-width: 900px) and (orientation: portrait) {
+  body.in-game #rotate-hint { display: flex; }
+  #game {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "top" "plates" "board";
+    padding: 6px; gap: 6px;
+  }
+  #leftbar { flex-direction: row; overflow-x: auto; }
+  #plates { flex-direction: row; }
+  .player-plate { min-width: 170px; flex-shrink: 0; }
+  .player-plate .face { width: 40px; height: 40px; }
+  #board { max-height: calc(100dvh - 210px); }
 }

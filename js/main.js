@@ -66,6 +66,7 @@
     OJ.ui.hideTooltip();
     $('#menu').style.display = 'none';
     $('#game').style.display = 'grid';
+    document.body.classList.add('in-game'); // mobile: show rotate guidance if portrait
     $('#log').innerHTML = '';
     const pool = Object.keys(OJ.CHARS).filter((c) => c !== charId);
     for (let i = pool.length - 1; i > 0; i--) {
@@ -97,6 +98,10 @@
 
     // mobile log drawer toggle
     $('#btn_log').onclick = () => { $('#rightbar').classList.toggle('open'); };
+    // dismiss the rotate-to-landscape hint (play portrait anyway)
+    $('#btn_rh_continue').onclick = () => { document.body.classList.remove('in-game'); };
+    // hide the rotate hint automatically once landscape is detected
+    window.addEventListener('orientationchange', () => { document.body.classList.remove('in-game'); });
 
     $('#board').addEventListener('click', (ev) => {
       const rect = ev.target.getBoundingClientRect();
@@ -111,6 +116,7 @@
     if (location.search.includes('auto')) {
       $('#menu').style.display = 'none';
       $('#game').style.display = 'grid';
+      document.body.classList.add('in-game');
       const bid = new URLSearchParams(location.search).get('board') || 'clover';
       const G = E().newGame({ p0cpu: true, boardId: bid });
       const io = OJ.ui.BrowserIO({ G });
@@ -120,6 +126,7 @@
     } else if (location.search.includes('battle')) {
       $('#menu').style.display = 'none';
       $('#game').style.display = 'grid';
+      document.body.classList.add('in-game');
       const G = E().newGame({ p0cpu: false });
       const io = OJ.ui.BrowserIO({ G });
       OJ.render.init($('#board'), G).then(async () => {
