@@ -13,12 +13,16 @@
     tileW: 100, tileH: 50, cx: 480, cy: 200,
   };
 
-  function loadImage(src) {
+  function loadImage(src, timeout) {
     return new Promise((res) => {
       const im = new Image();
-      im.onload = () => res(im);
-      im.onerror = () => res(null);
+      let done = false;
+      const finish = (v) => { if (!done) { done = true; res(v); } };
+      im.onload = () => finish(im);
+      im.onerror = () => finish(null);
       im.src = src;
+      // never let a stalled request block the whole game (black screen)
+      setTimeout(() => finish(null), timeout || 6000);
     });
   }
 
@@ -44,20 +48,26 @@
     R.cx = Math.floor(canvas.width / 2);
     R.cy = Math.floor((canvas.height - spanY * R.tileH / 2) / 2);
     const imgs = {};
-    for (const t of PANEL_IMGS) imgs['panel_' + t] = await loadImage('assets/panels/' + t + '.png');
+    // load panels in parallel
+    const panelImgs = await Promise.all(PANEL_IMGS.map((t) => loadImage('assets/panels/' + t + '.png')));
+    PANEL_IMGS.forEach((t, i) => { imgs['panel_' + t] = panelImgs[i]; });
     imgs.ring = await loadImage('assets/ui/ring.png');
-    for (const ch of Object.keys(OJ.CHARS)) {
-      imgs['unit_' + ch] = [];
-      for (let f = 0; f < 6; f++) {
-        imgs['unit_' + ch].push(await loadImage(`assets/units/${ch}/${String(f).padStart(2, '0')}.png`));
-      }
+    // only the sprites needed for THIS game (4 players) + the mobs — and
+    // load every frame in parallel so slow mobile links finish in one round
+    const needChars = new Set();
+    for (const p of G.players) {
+      const ch = OJ.CHARS[p.charId];
+      if (ch) needChars.add(ch.sprite);
+    }
+    const unitList = [];
+    for (const ch of needChars) {
+      for (let f = 0; f < 6; f++) unitList.push({ key: 'unit_' + ch, f, src: `assets/units/${ch}/${String(f).padStart(2, '0')}.png` });
     }
     for (const m of ['chicken', 'roboball', 'shifu', 'manager', 'flyingcastle']) {
-      imgs['unit_' + m] = [];
-      for (let f = 0; f < 6; f++) {
-        imgs['unit_' + m].push(await loadImage(`assets/units/${m}/${String(f).padStart(2, '0')}.png`));
-      }
+      for (let f = 0; f < 6; f++) unitList.push({ key: 'unit_' + m, f, src: `assets/units/${m}/${String(f).padStart(2, '0')}.png` });
     }
+    const unitImgs = await Promise.all(unitList.map((u) => loadImage(u.src)));
+    unitList.forEach((u, i) => { (imgs[u.key] = imgs[u.key] || [])[u.f] = unitImgs[i]; });
     R.images = imgs;
     const bg = await loadImage('assets/board/clover_l.png');
     if (bg) R.bgPattern = R.ctx.createPattern(bg, 'repeat');
@@ -66,6 +76,8 @@
       R.playerView[p.idx] = { x: c.x, y: c.y, frame: 0, moving: false };
     }
     requestAnimationFrame(tick);
+    // tell the host (loading overlay) that the board is ready to show
+    if (R.onReady) { const cb = R.onReady; R.onReady = null; cb(); }
   }
 
   function panel(id) { return R.G.board.panels[id]; }
@@ -227,6 +239,7 @@
       if (!frames) continue;
       const ko = !!p.ko;
       const f = frames[ko ? 4 : v.frame % frames.length];
+      if (!f) continue; // sprite frame failed to load — skip this unit
       const s = (R.tileW * 1.05) / f.width;
       const w = f.width * s, h = f.height * s;
       const baseY = py - h * 0.72;

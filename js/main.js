@@ -60,6 +60,9 @@
     }
   }
 
+  function showLoading() { $('#loading').style.display = 'flex'; }
+  function hideLoading() { $('#loading').style.display = 'none'; }
+
   async function startGame(charId) {
     if (running) return;
     running = true;
@@ -84,9 +87,12 @@
     });
     $('#btn_restart').onclick = () => { location.reload(); };
     try {
+      showLoading(); // assets load inside runGame -> onStart -> render.init
+      OJ.render.R.onReady = hideLoading;
       await E().runGame(G, io, 150);
     } catch (err) {
       console.error(err);
+      hideLoading();
       OJ.ui.banner('Error: ' + err.message, 'ko', 4000);
     }
     running = false;
@@ -121,14 +127,18 @@
       const G = E().newGame({ p0cpu: true, boardId: bid });
       const io = OJ.ui.BrowserIO({ G });
       OJ.render.R.speed = 0.02;
+      showLoading();
+      OJ.render.R.onReady = hideLoading;
       running = true;
-      E().runGame(G, io, 150).catch((e) => console.error(e));
+      E().runGame(G, io, 150).catch((e) => { console.error(e); hideLoading(); });
     } else if (location.search.includes('battle')) {
       $('#menu').style.display = 'none';
       $('#game').style.display = 'grid';
       document.body.classList.add('in-game');
       const G = E().newGame({ p0cpu: false });
       const io = OJ.ui.BrowserIO({ G });
+      showLoading();
+      OJ.render.R.onReady = hideLoading;
       OJ.render.init($('#board'), G).then(async () => {
         const a = G.players[1], d = G.players[0];
         await io.onBattleStart(G, a, d, {});

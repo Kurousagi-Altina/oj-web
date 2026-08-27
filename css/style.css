@@ -292,6 +292,19 @@ button, .card, .charcard, .boardcard { touch-action: manipulation; }
 .mobile-only { display: none; }
 
 /* rotate-to-landscape guidance (shown during portrait gameplay) */
+#loading {
+  position: fixed; inset: 0; z-index: 300; display: none;
+  background: #0d1116; color: var(--gold);
+  align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+}
+#loading .spinner {
+  width: 46px; height: 46px; border: 4px solid #33404d; border-top-color: var(--gold);
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+#loading p { color: var(--dim); font-size: 15px; letter-spacing: 2px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* rotate-to-landscape guidance (shown during portrait gameplay) */
 #rotate-hint {
   display: none; position: fixed; inset: 0; z-index: 200;
   background: rgba(4,6,9,.95); text-align: center;
