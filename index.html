@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100% Orange Juice — Web Replica</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="menu">
+    <h1>100% Orange Juice <span class="sub">网页复刻版 DEMO</span></h1>
+    <p class="menu-hint">选择地图与角色（与 3 名 CPU 对战 · 率先完成 Norma 6 者获胜）</p>
+    <div id="boardrow"></div>
+    <div id="chargrid"></div>
+  </div>
+
+  <div id="game" style="display:none">
+    <div id="leftbar">
+      <div id="plates"></div>
+    </div>
+    <div id="center">
+      <div id="topbar">
+        <span id="chapter">第 1 章</span>
+        <span id="fieldevents"></span>
+        <span id="deckcount" title="中央卡堆剩余">🂠 48</span>
+        <span class="spacer"></span>
+        <span class="speeds">
+          <button class="speed" data-s="2">1x</button>
+          <button class="speed sel" data-s="1">2x</button>
+          <button class="speed" data-s="0.5">4x</button>
+        </span>
+        <button id="btn_lang" class="btn small">EN</button>
+        <button id="btn_restart" class="btn small">↻</button>
+      </div>
+      <div id="boardwrap">
+        <canvas id="board" width="960" height="760"></canvas>
+        <div id="battle"></div>
+        <div id="handwrap"><div id="hand"></div></div>
+      </div>
+    </div>
+    <div id="rightbar">
+      <div id="logbox"><div id="log"></div></div>
+    </div>
+  </div>
+
+  <div id="banners"></div>
+  <div id="modals"></div>
+  <div id="tooltip"></div>
+
+  <script src="js/i18n_data.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/boards.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
