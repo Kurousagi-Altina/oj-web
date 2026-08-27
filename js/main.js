@@ -92,6 +92,12 @@
   }
 
   window.addEventListener('DOMContentLoaded', () => {
+    // the character select scrolls vertically with the page (mouse wheel /
+    // touch native scrolling) — no custom drag needed
+
+    // mobile log drawer toggle
+    $('#btn_log').onclick = () => { $('#rightbar').classList.toggle('open'); };
+
     $('#board').addEventListener('click', (ev) => {
       const rect = ev.target.getBoundingClientRect();
       const scale = OJ.render.R.canvas.width / rect.width;

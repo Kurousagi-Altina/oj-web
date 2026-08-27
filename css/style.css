@@ -15,6 +15,7 @@ body {
 #menu {
   display: flex; flex-direction: column; align-items: center;
   height: 100vh; padding-top: 5vh; gap: 20px;
+  overflow-y: auto; scrollbar-width: thin;
 }
 #menu h1 { font-size: 44px; color: var(--gold); text-shadow: 0 3px 0 #7a3c00; letter-spacing: 1px; }
 #menu h1 .sub { font-size: 16px; color: var(--dim); margin-left: 12px; letter-spacing: 2px; }
@@ -31,7 +32,10 @@ body {
 .boardcard .binfo { font-size: 12px; color: #9db2bd; }
 .boardcard .binfo.boss { color: #ff8a8a; }
 .boardcard .binfo.ev { color: #8cd6ff; }
-#chargrid { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 1300px; }
+#chargrid {
+  display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+  max-width: 1300px; padding: 6px 4px 14px;
+}
 .charcard {
   width: 188px; background: linear-gradient(#242e39, #161c23);
   border: 2px solid #3a4750; border-radius: 14px; padding: 16px 12px;
@@ -282,3 +286,63 @@ body {
 }
 .dice.big .die { width: 32px; height: 32px; font-size: 19px; border-radius: 8px; }
 @keyframes diepop { from { transform: scale(.3) rotate(-30deg); } to { transform: scale(1) rotate(0); } }
+
+/* ================= touch / mobile ================= */
+button, .card, .charcard, .boardcard { touch-action: manipulation; }
+.mobile-only { display: none; }
+
+@media (max-width: 900px) {
+  /* ---------- menu ---------- */
+  #menu { height: 100dvh; padding-top: 3vh; gap: 14px; }
+  #menu h1 { font-size: 30px; }
+  #menu h1 .sub { font-size: 13px; }
+  #boardrow { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; max-width: 96vw; padding: 4px 6px 10px; scrollbar-width: thin; }
+  .boardcard { width: 170px; flex-shrink: 0; }
+  .charcard { width: 158px; }
+
+  /* ---------- game: single column ---------- */
+  #game {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "top" "plates" "board";
+    height: 100dvh; padding: 6px; gap: 6px; overflow: hidden;
+  }
+  #center { display: contents; } /* let topbar/boardwrap become grid children */
+  #topbar { grid-area: top; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+  #leftbar { grid-area: plates; flex-direction: row; overflow-x: auto; scrollbar-width: none; }
+  #leftbar::-webkit-scrollbar { display: none; }
+  #plates { flex-direction: row; }
+  .player-plate { min-width: 185px; flex-shrink: 0; padding: 6px 8px; }
+  .player-plate .face { width: 46px; height: 46px; }
+  #boardwrap { grid-area: board; }
+  #board { width: 100%; height: auto; max-height: calc(100dvh - 200px); }
+  #hand .card { width: 74px; height: 104px; }
+
+  /* ---------- floating log drawer ---------- */
+  .mobile-only { display: inline-block; }
+  #rightbar {
+    display: none;
+    position: fixed; right: 8px; bottom: 8px; width: min(260px, 80vw); height: 42dvh;
+    z-index: 70; background: var(--bg1); border: 1px solid var(--line);
+    border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.55);
+  }
+  #rightbar.open { display: flex; }
+  #logbox { font-size: 11px; }
+
+  /* ---------- modals & battle ---------- */
+  .modal-box { max-width: 94vw; max-height: 90dvh; padding: 16px; }
+  .modal-box.wide { min-width: 0; }
+  .modal-box h3 { font-size: 16px; }
+  .btn { padding: 9px 16px; font-size: 14px; }
+  .hand .card { width: 92px; height: 128px; }
+  .bt-unit { width: 140px; padding: 10px 8px; }
+  .bt-face { width: 64px; height: 64px; }
+  .bt-name { font-size: 15px; }
+  .bt-row { gap: 10px; }
+  .bt-stats { font-size: 10.5px; }
+  .bt-roll .die { width: 24px; height: 24px; font-size: 13px; }
+  .bt-log { width: 92%; max-height: 110px; }
+
+  /* ---------- roll cutscene close-up ---------- */
+  #banners .banner { font-size: 18px; padding: 6px 18px; }
+}
